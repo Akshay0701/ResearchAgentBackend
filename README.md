@@ -1,104 +1,193 @@
-# AI Research Assistant Backend
+# Research Agent 🤖
 
-A FastAPI-based backend service that provides an AI-powered research assistant capable of searching the web, extracting content, and generating summaries using OpenAI's GPT models.
+A powerful AI-powered research assistant that helps users gather, analyze, and summarize information from various sources. This agent combines web search capabilities with advanced natural language processing to provide accurate, well-sourced answers to research queries.
 
-## Features
+## Overview
 
-- Web search using Google Custom Search API
-- Content extraction from web pages using newspaper3k
-- AI-powered summarization using OpenAI GPT-4
-- Content moderation and safety checks
-- RESTful API with FastAPI
-- Comprehensive logging
-- Error handling and validation
+This project implements a research assistant that can:
+- Process user queries and break them down into searchable components
+- Search the web for relevant information using Google Search API
+- Extract and clean content from web pages
+- Analyze and summarize information using OpenAI's GPT-4
+- Present well-structured, source-attributed responses
 
-## Prerequisites
+The agent is designed to be a helpful tool for researchers, students, and anyone needing to gather and synthesize information quickly and accurately.
 
-- Python 3.8+
-- Google Custom Search API credentials
+## Technical Approach
+
+### Core Components
+
+1. **Query Processing & Search Pipeline**
+   - Uses Google Custom Search API for web search
+   - Implements content extraction using `newspaper3k` and `trafilatura`
+   - Processes and cleans web content to remove irrelevant information
+
+2. **Summarization Engine**
+   - Leverages OpenAI's GPT-4 for intelligent summarization
+   - Implements context-aware summarization with source attribution
+   - Uses temperature control (0.7) for balanced creativity and accuracy
+
+3. **Backend Architecture**
+   - Built with FastAPI for high-performance async operations
+   - Modular design with separate services for search, summarization, and content processing
+   - Implements proper error handling and logging
+
+### Key Technologies
+- **Backend Framework**: FastAPI
+- **Search**: Google Custom Search API
+- **Content Processing**: newspaper3k, trafilatura
+- **AI/ML**: OpenAI GPT-4
+- **Environment Management**: python-dotenv
+- **HTTP Client**: httpx, requests
+
+## Security Measures
+
+1. **API Key Protection**
+   - Environment variables for sensitive credentials
+   - No hardcoded API keys in the codebase
+   - Secure handling of OpenAI and Google API keys
+
+2. **Content Safety**
+   - Input validation using Pydantic models
+   - Content sanitization during web scraping
+   - Rate limiting on API endpoints
+
+3. **Potential Improvements**
+   - Implement user authentication
+   - Add request rate limiting
+   - Implement content filtering for sensitive topics
+   - Add input validation for malicious prompts
+
+## Setup & Running Instructions
+
+### Prerequisites
+- Python 3.8 or higher
 - OpenAI API key
+- Google Custom Search API key and Search Engine ID
 
-## Setup
+### Installation
 
 1. Clone the repository:
-```bash
-git clone <repository-url>
-cd ai-research-assistant-backend
-```
+   ```bash
+   git clone https://github.com/akshay0701/ResearchAgent.git
+   cd ResearchAgent
+   ```
 
-2. Create a virtual environment and activate it:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
 3. Install dependencies:
-```bash
-pip install -r requirements.txt
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Create a `.env` file in the root directory with your API keys:
+   ```
+   OPENAI_API_KEY=your_openai_api_key
+   GOOGLE_API_KEY=your_google_api_key
+   GOOGLE_SEARCH_ENGINE_ID=your_search_engine_id
+   ```
+
+### Running the Application
+
+1. Start the backend server:
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+
+2. The API will be available at `http://localhost:8000`
+
+## Usage Guide
+
+1. **Making Queries**
+   - Send POST requests to `/api/research` endpoint
+   - Include your query in the request body
+   - Example query format:
+     ```json
+     {
+       "query": "What are the latest developments in quantum computing?"
+     }
+     ```
+
+2. **Response Format**
+   - The agent returns a JSON response with:
+     - Summary of findings
+     - Source URLs
+     - Confidence scores
+     - Relevant quotes
+
+## Example Scenarios
+
+### Example 1: Research Query
+**Input:**
+```json
+{
+  "query": "What are the environmental impacts of electric vehicles?"
+}
 ```
 
-4. Create a `.env` file in the root directory with the following variables:
-```env
-GOOGLE_API_KEY=your_google_api_key
-GOOGLE_CSE_ID=your_custom_search_engine_id
-OPENAI_API_KEY=your_openai_api_key
+**Output:**
+```json
+{
+  "summary": "Electric vehicles (EVs) have several environmental impacts...",
+  "sources": [
+    "https://example.com/ev-impact-2023",
+    "https://example.com/green-transport"
+  ],
+  "key_points": [
+    "Reduced direct emissions",
+    "Battery production impact",
+    "Grid dependency"
+  ]
+}
 ```
 
-## Running the Application
-
-Start the development server:
-```bash
-uvicorn app.main:app --reload
+### Example 2: Technical Research
+**Input:**
+```json
+{
+  "query": "Compare React vs Vue.js for large-scale applications"
+}
 ```
 
-The API will be available at `http://localhost:8000`
+**Output:**
+```json
+{
+  "summary": "Both React and Vue.js are powerful frameworks...",
+  "sources": [
+    "https://example.com/framework-comparison",
+    "https://example.com/react-vs-vue"
+  ],
+  "key_points": [
+    "Performance metrics",
+    "Learning curve",
+    "Ecosystem size"
+  ]
+}
+```
 
-## API Documentation
+## Time Spent & Reflections
 
-Once the server is running, you can access:
-- Interactive API documentation (Swagger UI): `http://localhost:8000/docs`
-- Alternative API documentation (ReDoc): `http://localhost:8000/redoc`
+The project was developed over 48 hours with the following time allocation:
+- 30%: Core architecture and API integration
+- 25%: Search and content processing implementation
+- 25%: Summarization engine and response formatting
+- 20%: Testing, documentation, and refinement
 
-### Endpoints
+### Challenges & Learnings
+- Balancing response quality with API rate limits
+- Optimizing content extraction for various website formats
+- Implementing effective error handling for API failures
 
-- `GET /health` - Health check endpoint
-- `POST /api/ask` - Submit a research query
-  - Request body:
-    ```json
-    {
-        "query": "Your research question here"
-    }
-    ```
-  - Response:
-    ```json
-    {
-        "answer": "Generated summary and answer",
-        "sources": [
-            {
-                "title": "Source title",
-                "url": "Source URL"
-            }
-        ]
-    }
-    ```
-
-## Error Handling
-
-The API includes comprehensive error handling:
-- 400 Bad Request: Invalid input or validation errors
-- 500 Internal Server Error: Server-side processing errors
-
-All errors are logged with appropriate context.
-
-## Development
-
-The project follows a modular structure:
-- `app/main.py`: FastAPI application entry point
-- `app/routers/`: API route definitions
-- `app/services/`: Core business logic
-- `app/models/`: Pydantic models and schemas
-- `app/utils/`: Utility functions and logging
+### Future Improvements
+- Add support for more search engines
+- Implement caching for frequent queries
+- Add support for file uploads and PDF processing
+- Develop a web interface for easier interaction
 
 ## License
 
-MIT License 
+MIT License - feel free to use this project for your own purposes.
